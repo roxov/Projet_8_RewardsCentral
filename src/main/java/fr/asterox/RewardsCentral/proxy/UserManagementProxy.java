@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import fr.asterox.RewardsCentral.dto.UserReward;
+import fr.asterox.RewardsCentral.dto.UserRewardDTO;
 import fr.asterox.RewardsCentral.dto.VisitedLocationDTO;
 
 @FeignClient(name = "UserManagement", url = "localhost:9001")
@@ -20,10 +20,10 @@ public interface UserManagementProxy {
 	@RequestMapping("/getVisitedLocations")
 	public List<VisitedLocationDTO> getVisitedLocations(@RequestParam String userName);
 
-	@RequestMapping("/getRewards")
-	public List<UserReward> getRewards(@RequestParam String userName);
+	@RequestMapping("/getUserRewards")
+	public List<UserRewardDTO> getUserRewards(@RequestParam String userName);
 
-	@RequestMapping("/addRewards")
-	public void addUserReward(@RequestParam String userName, @RequestBody UserReward userReward);
+	@RequestMapping("/addReward")
+	public void addReward(@RequestParam String userName, @RequestBody UserRewardDTO userReward);
 
 }

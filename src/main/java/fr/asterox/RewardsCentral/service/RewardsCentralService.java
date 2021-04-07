@@ -3,12 +3,14 @@ package fr.asterox.RewardsCentral.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.asterox.RewardsCentral.controller.UserManagementController;
 import fr.asterox.RewardsCentral.dto.LocationDTO;
-import fr.asterox.RewardsCentral.dto.UserReward;
+import fr.asterox.RewardsCentral.dto.UserRewardDTO;
 import fr.asterox.RewardsCentral.dto.VisitedLocationDTO;
 import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
@@ -24,6 +26,7 @@ public class RewardsCentralService implements IRewardsCentralService {
 	@Autowired
 	UserManagementController userManagementController;
 
+	private Logger logger = LoggerFactory.getLogger(RewardsCentralService.class);
 	private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
 
 	// proximity in miles
@@ -48,17 +51,20 @@ public class RewardsCentralService implements IRewardsCentralService {
 	}
 
 	@Override
-	public void calculateRewards(List<VisitedLocationDTO> userLocations, List<UserReward> userRewards,
+	public void calculateRewards(List<VisitedLocationDTO> userLocations, List<UserRewardDTO> userRewards,
 			String userName) {
 		List<Attraction> attractions = gpsUtil.getAttractions();
+
+		logger.debug("calculating rewards for user :" + userName);
 
 		for (VisitedLocationDTO visitedLocation : userLocations) {
 			for (Attraction attraction : attractions) {
 				if (userRewards.stream().filter(r -> r.attraction.attractionName.equals(attraction.attractionName))
 						.count() == 0) {
 					if (nearAttraction(visitedLocation, attraction)) {
-						userManagementController.addUserReward(userName, new UserReward(visitedLocation, attraction,
+						userManagementController.addReward(userName, new UserRewardDTO(visitedLocation, attraction,
 								getRewardPoints(attraction, userManagementController.getUserId(userName))));
+
 					}
 				}
 			}
