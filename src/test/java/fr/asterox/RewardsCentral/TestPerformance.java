@@ -1,4 +1,4 @@
-package fr.asterox.RewardsCentral.service;
+package fr.asterox.RewardsCentral;
 
 public class TestPerformance {
 

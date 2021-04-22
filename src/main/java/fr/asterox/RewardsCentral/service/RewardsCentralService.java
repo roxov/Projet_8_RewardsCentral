@@ -2,16 +2,17 @@ package fr.asterox.RewardsCentral.service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import fr.asterox.RewardsCentral.controller.UserManagementController;
 import fr.asterox.RewardsCentral.dto.LocationDTO;
 import fr.asterox.RewardsCentral.dto.UserRewardDTO;
 import fr.asterox.RewardsCentral.dto.VisitedLocationDTO;
+import fr.asterox.RewardsCentral.proxy.UserManagementProxy;
 import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
@@ -24,7 +25,7 @@ public class RewardsCentralService implements IRewardsCentralService {
 	@Autowired
 	private RewardCentral rewardsCentral;
 	@Autowired
-	UserManagementController userManagementController;
+	UserManagementProxy userManagementProxy;
 
 	private Logger logger = LoggerFactory.getLogger(RewardsCentralService.class);
 	private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
@@ -37,17 +38,18 @@ public class RewardsCentralService implements IRewardsCentralService {
 		super();
 	}
 
-	public RewardsCentralService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
-		this.gpsUtil = gpsUtil;
-		this.rewardsCentral = rewardCentral;
-	}
-
 	public void setProximityBuffer(int proximityBuffer) {
 		this.proximityBuffer = proximityBuffer;
 	}
 
 	public void setDefaultProximityBuffer() {
 		proximityBuffer = defaultProximityBuffer;
+	}
+
+	public void calculateRewardsThread(List<VisitedLocationDTO> userLocations, List<UserRewardDTO> userRewards,
+			String userName) throws InterruptedException, ExecutionException {
+		Thread t1 = new Thread(() -> this.calculateRewards(userLocations, userRewards, userName));
+		t1.start();
 	}
 
 	@Override
@@ -62,8 +64,8 @@ public class RewardsCentralService implements IRewardsCentralService {
 				if (userRewards.stream().filter(r -> r.attraction.attractionName.equals(attraction.attractionName))
 						.count() == 0) {
 					if (nearAttraction(visitedLocation, attraction)) {
-						userManagementController.addReward(userName, new UserRewardDTO(visitedLocation, attraction,
-								getRewardPoints(attraction, userManagementController.getUserId(userName))));
+						userManagementProxy.addReward(userName, new UserRewardDTO(visitedLocation, attraction,
+								getRewardPoints(attraction, userManagementProxy.getUserId(userName))));
 
 					}
 				}
