@@ -11,5 +11,9 @@ import fr.asterox.RewardsCentral.dto.VisitedLocationDTO;
  *
  */
 public interface IRewardsCentralService {
-	public void calculateRewards(List<VisitedLocationDTO> userLocations, List<UserRewardDTO> userRewards, String userName);
+	public void calculateRewards(List<VisitedLocationDTO> userLocations, List<UserRewardDTO> userRewards,
+			String userName);
+
+	public void calculateAndAddRewards(List<VisitedLocationDTO> userLocations, List<UserRewardDTO> userRewards,
+			String userName);
 }

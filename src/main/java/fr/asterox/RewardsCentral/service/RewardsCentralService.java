@@ -2,7 +2,6 @@ package fr.asterox.RewardsCentral.service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,14 +45,15 @@ public class RewardsCentralService implements IRewardsCentralService {
 		proximityBuffer = defaultProximityBuffer;
 	}
 
-	public void calculateRewardsThread(List<VisitedLocationDTO> userLocations, List<UserRewardDTO> userRewards,
-			String userName) throws InterruptedException, ExecutionException {
-		Thread t1 = new Thread(() -> this.calculateRewards(userLocations, userRewards, userName));
+	@Override
+	public void calculateRewards(List<VisitedLocationDTO> userLocations, List<UserRewardDTO> userRewards,
+			String userName) {
+		Thread t1 = new Thread(() -> this.calculateAndAddRewards(userLocations, userRewards, userName));
 		t1.start();
 	}
 
 	@Override
-	public void calculateRewards(List<VisitedLocationDTO> userLocations, List<UserRewardDTO> userRewards,
+	public void calculateAndAddRewards(List<VisitedLocationDTO> userLocations, List<UserRewardDTO> userRewards,
 			String userName) {
 		List<Attraction> attractions = gpsUtil.getAttractions();
 

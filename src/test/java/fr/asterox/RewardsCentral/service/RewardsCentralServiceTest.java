@@ -68,7 +68,8 @@ public class RewardsCentralServiceTest {
 	}
 
 	@Test
-	public void givenAttractionAlreadyExistingInUserRewards_whenCalculateRewards_thenReturnCalculation() {
+	public void givenAttractionAlreadyExistingInUserRewards_whenCalculateRewards_thenReturnCalculation()
+			throws InterruptedException {
 		// GIVEN
 		VisitedLocationDTO visitedLocation = new VisitedLocationDTO(new LocationDTO(144, 155), new Date(),
 				UUID.fromString("329e4bf3-ee62-4a67-b7d7-b0dc06989c6e"));
@@ -85,6 +86,7 @@ public class RewardsCentralServiceTest {
 
 		// WHEN
 		rewardsCentralService.calculateRewards(userLocations, userRewards, "jo");
+		Thread.sleep(1000);
 
 		// THEN
 		verify(gpsUtil, Mockito.times(1)).getAttractions();

@@ -1,5 +1,7 @@
 package fr.asterox.RewardsCentral.controller;
 
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +24,16 @@ public class RewardsCentralController {
 	private Logger logger = LoggerFactory.getLogger(RewardsCentralController.class);
 
 	@PutMapping("/calculateRewards")
-	public void calculateRewards(@RequestParam String userName) {
+	public void calculateRewards(@RequestParam @NotNull(message = "username is compulsory") String userName) {
 		logger.debug("calculating rewards of user :" + userName);
 		rewardsCentralService.calculateRewards(userManagementProxy.getVisitedLocations(userName),
+				userManagementProxy.getUserRewards(userName), userName);
+	}
+
+	@PutMapping("/testCalculateRewards")
+	public void testCalculateRewards(@RequestParam @NotNull(message = "username is compulsory") String userName) {
+		logger.debug("calculating rewards for tests");
+		rewardsCentralService.calculateAndAddRewards(userManagementProxy.getVisitedLocations(userName),
 				userManagementProxy.getUserRewards(userName), userName);
 	}
 
