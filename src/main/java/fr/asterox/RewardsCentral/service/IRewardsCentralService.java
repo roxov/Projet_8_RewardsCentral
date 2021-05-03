@@ -1,9 +1,6 @@
 package fr.asterox.RewardsCentral.service;
 
-import java.util.List;
-
-import fr.asterox.RewardsCentral.dto.UserRewardDTO;
-import fr.asterox.RewardsCentral.dto.VisitedLocationDTO;
+import java.util.UUID;
 
 /**
  * 
@@ -11,9 +8,9 @@ import fr.asterox.RewardsCentral.dto.VisitedLocationDTO;
  *
  */
 public interface IRewardsCentralService {
-	public void calculateRewards(List<VisitedLocationDTO> userLocations, List<UserRewardDTO> userRewards,
-			String userName);
+	public void calculateRewards(String userName);
 
-	public void calculateAndAddRewards(List<VisitedLocationDTO> userLocations, List<UserRewardDTO> userRewards,
-			String userName);
+	public void calculateAndAddRewards(String userName);
+
+	public int getAttractionRewardPoints(UUID attractionId, UUID userId);
 }

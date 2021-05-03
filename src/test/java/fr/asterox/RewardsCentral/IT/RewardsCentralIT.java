@@ -3,6 +3,8 @@ package fr.asterox.RewardsCentral.IT;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,15 @@ public class RewardsCentralIT {
 	@Test
 	public void givenAUsername_whenCalculateRewards_thenReturn200() throws Exception {
 		mockMvc.perform(MockMvcRequestBuilders.put("/calculateRewards?userName={userName}", "jo")
+				.accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
+	}
+
+	@Test
+	public void givenUserAndAttractionUUID_whenGetAttractionRewardPoints_thenReturn200() throws Exception {
+		UUID attractionId = UUID.fromString("329e4bf3-ee62-4a67-b7d7-b0dc06989c6e");
+		UUID userId = UUID.fromString("333e4bf3-ee62-4a67-b7d7-b0dc06989c6e");
+		mockMvc.perform(MockMvcRequestBuilders
+				.get("/getAttractionRewardPoints?attractionId={userName}&userId={userId}", attractionId, userId)
 				.accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
 	}
 

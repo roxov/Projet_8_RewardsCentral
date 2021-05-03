@@ -8,29 +8,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import fr.asterox.RewardsCentral.dto.AttractionDTO;
 import fr.asterox.RewardsCentral.dto.LocationDTO;
 import fr.asterox.RewardsCentral.dto.UserRewardDTO;
 import fr.asterox.RewardsCentral.dto.VisitedLocationDTO;
 import fr.asterox.RewardsCentral.proxy.UserManagementProxy;
-import gpsUtil.GpsUtil;
-import gpsUtil.location.Attraction;
-import gpsUtil.location.Location;
 import rewardCentral.RewardCentral;
 
 @Service
 public class RewardsCentralService implements IRewardsCentralService {
 	@Autowired
-	private GpsUtil gpsUtil;
-	@Autowired
 	private RewardCentral rewardsCentral;
 	@Autowired
 	UserManagementProxy userManagementProxy;
+	@Autowired
+	AttractionService attractionService;
 
 	private Logger logger = LoggerFactory.getLogger(RewardsCentralService.class);
 	private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
 
 	// proximity in miles
-	private int defaultProximityBuffer = 10;
+	private int defaultProximityBuffer = 10000;
 	private int proximityBuffer = defaultProximityBuffer;
 
 	public RewardsCentralService() {
@@ -46,26 +44,24 @@ public class RewardsCentralService implements IRewardsCentralService {
 	}
 
 	@Override
-	public void calculateRewards(List<VisitedLocationDTO> userLocations, List<UserRewardDTO> userRewards,
-			String userName) {
-		Thread t1 = new Thread(() -> this.calculateAndAddRewards(userLocations, userRewards, userName));
+	public void calculateRewards(String username) {
+		Thread t1 = new Thread(() -> this.calculateAndAddRewards(username));
 		t1.start();
 	}
 
 	@Override
-	public void calculateAndAddRewards(List<VisitedLocationDTO> userLocations, List<UserRewardDTO> userRewards,
-			String userName) {
-		List<Attraction> attractions = gpsUtil.getAttractions();
-
-		logger.debug("calculating rewards for user :" + userName);
+	public void calculateAndAddRewards(String username) {
+		List<VisitedLocationDTO> userLocations = userManagementProxy.getVisitedLocations(username);
+		List<UserRewardDTO> userRewards = userManagementProxy.getUserRewards(username);
+		logger.debug("calculating rewards for user :" + username);
 
 		for (VisitedLocationDTO visitedLocation : userLocations) {
-			for (Attraction attraction : attractions) {
+			for (AttractionDTO attraction : attractionService.getAttractionsList()) {
 				if (userRewards.stream().filter(r -> r.attraction.attractionName.equals(attraction.attractionName))
 						.count() == 0) {
 					if (nearAttraction(visitedLocation, attraction)) {
-						userManagementProxy.addReward(userName, new UserRewardDTO(visitedLocation, attraction,
-								getRewardPoints(attraction, userManagementProxy.getUserId(userName))));
+						userManagementProxy.addReward(username, new UserRewardDTO(visitedLocation, attraction,
+								getRewardPoints(attraction, userManagementProxy.getUserId(username))));
 
 					}
 				}
@@ -73,15 +69,20 @@ public class RewardsCentralService implements IRewardsCentralService {
 		}
 	}
 
-	private boolean nearAttraction(VisitedLocationDTO visitedLocation, Attraction attraction) {
+	@Override
+	public int getAttractionRewardPoints(UUID attractionId, UUID userId) {
+		return rewardsCentral.getAttractionRewardPoints(attractionId, userId);
+	}
+
+	private boolean nearAttraction(VisitedLocationDTO visitedLocation, AttractionDTO attraction) {
 		return getDistance(visitedLocation.location, attraction) > proximityBuffer ? false : true;
 	}
 
-	private int getRewardPoints(Attraction attraction, UUID userId) {
+	private int getRewardPoints(AttractionDTO attraction, UUID userId) {
 		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, userId);
 	}
 
-	public double getDistance(LocationDTO loc1, Location loc2) {
+	public double getDistance(LocationDTO loc1, LocationDTO loc2) {
 		double lat1 = Math.toRadians(loc1.latitude);
 		double lon1 = Math.toRadians(loc1.longitude);
 		double lat2 = Math.toRadians(loc2.latitude);

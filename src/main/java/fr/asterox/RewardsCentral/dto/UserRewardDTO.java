@@ -1,20 +1,22 @@
 package fr.asterox.RewardsCentral.dto;
 
-import gpsUtil.location.Attraction;
-
 public class UserRewardDTO {
 
-	public final VisitedLocationDTO visitedLocation;
-	public final Attraction attraction;
+	public VisitedLocationDTO visitedLocation;
+	public AttractionDTO attraction;
 	private int rewardPoints;
 
-	public UserRewardDTO(VisitedLocationDTO visitedLocation, Attraction attraction, int rewardPoints) {
+	public UserRewardDTO() {
+		super();
+	}
+
+	public UserRewardDTO(VisitedLocationDTO visitedLocation, AttractionDTO attraction, int rewardPoints) {
 		this.visitedLocation = visitedLocation;
 		this.attraction = attraction;
 		this.rewardPoints = rewardPoints;
 	}
 
-	public UserRewardDTO(VisitedLocationDTO visitedLocation, Attraction attraction) {
+	public UserRewardDTO(VisitedLocationDTO visitedLocation, AttractionDTO attraction) {
 		this.visitedLocation = visitedLocation;
 		this.attraction = attraction;
 	}
@@ -25,6 +27,22 @@ public class UserRewardDTO {
 
 	public int getRewardPoints() {
 		return rewardPoints;
+	}
+
+	public VisitedLocationDTO getVisitedLocation() {
+		return visitedLocation;
+	}
+
+	public void setVisitedLocation(VisitedLocationDTO visitedLocation) {
+		this.visitedLocation = visitedLocation;
+	}
+
+	public AttractionDTO getAttraction() {
+		return attraction;
+	}
+
+	public void setAttraction(AttractionDTO attraction) {
+		this.attraction = attraction;
 	}
 
 	@Override
