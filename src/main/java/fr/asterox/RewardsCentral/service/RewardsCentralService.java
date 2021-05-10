@@ -2,6 +2,8 @@ package fr.asterox.RewardsCentral.service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ public class RewardsCentralService implements IRewardsCentralService {
 
 	private Logger logger = LoggerFactory.getLogger(RewardsCentralService.class);
 	private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
+	private ExecutorService executor = Executors.newWorkStealingPool();
 
 	// proximity in miles
 	private int defaultProximityBuffer = 10000;
@@ -45,8 +48,7 @@ public class RewardsCentralService implements IRewardsCentralService {
 
 	@Override
 	public void calculateRewards(String username) {
-		Thread t1 = new Thread(() -> this.calculateAndAddRewards(username));
-		t1.start();
+		executor.submit(() -> this.calculateAndAddRewards(username));
 	}
 
 	@Override
